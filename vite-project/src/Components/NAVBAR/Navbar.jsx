@@ -1,8 +1,12 @@
 import logo from "../../assets/Logo.jpg"
 import styles from "./Navbar.module.css"
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { CartContext } from '../CART/CartContext';
+import cartIcon from '../../assets/Carrito.jpg';
 const Navbar = () => {
+  const { cart } = useContext(CartContext); 
+
   return (
 <header className={styles.navbar}>
       <nav className="navbar bg-body-tertiary">
@@ -13,10 +17,12 @@ const Navbar = () => {
           <Link className="nav-link active" aria-current="page" to="/">Inicio</Link>
           <Link className="nav-link" to="/Clasicas">Clásicas</Link>
           <Link className="nav-link" to="/Especiales">Especiales</Link>
-          <form className="d-flex" role="search">
-            <input className="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" id="Form"/>
-            <button className="btn btn-outline-success" type="submit">Buscar</button>
-          </form>
+          <div>
+          <Link to="/carrito">
+          <img src={cartIcon} alt="Carrito" width="30" height="30" />
+          Carrito ({cart.reduce((acc, item) => acc + item.quantity, 0)})
+        </Link>
+          </div>
         </div>
       </nav>
     </header>

@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { db } from '../../products/firebase'; 
 import { doc, getDoc } from 'firebase/firestore';
+import { CartContext } from '../CART/CartContext.jsx'; 
 
 const DetalleHamburguesa = () => {
   const { id } = useParams();
   const [hamburguesa, setHamburguesa] = useState(null);
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [loading, setLoading] = useState(true);
+  const { addToCart } = useContext(CartContext);
+  const [cantidad, setCantidad] = useState(1);
 
   useEffect(() => {
     const fetchHamburguesa = async () => {
       try {
-        // Simular una carga de datos con 2 segundos de retraso
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        // Referencia al documento de la hamburguesa en Firestore
-        const docRef = doc(db, 'hamburguesas', id);
+        const docRef = doc(db, 'products', id);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -25,7 +25,7 @@ const DetalleHamburguesa = () => {
       } catch (error) {
         console.error("Error fetching document: ", error);
       } finally {
-        setLoading(false); // Establecer el estado de carga a false
+        setLoading(false);
       }
     };
 
@@ -40,12 +40,30 @@ const DetalleHamburguesa = () => {
     return <div>Hamburguesa no encontrada</div>;
   }
 
+  const handleSumar = () => {
+    setCantidad(cantidad + 1);
+  };
+
+  const handleRestar = () => {
+    setCantidad(Math.max(cantidad - 1, 1));
+  };
+
+  const handleAgregarAlCarrito = () => {
+    addToCart(hamburguesa, cantidad);
+  };
+
   return (
     <div>
       <h2>{hamburguesa.nombre}</h2>
       <img src={hamburguesa.imagenUrl} alt={hamburguesa.nombre} width="200" height="200" />
       <p>{hamburguesa.descripcion}</p>
       <p>Precio: ${hamburguesa.precio}</p>
+      <div>
+        <button onClick={handleRestar}>-</button>
+        <span>{cantidad}</span>
+        <button onClick={handleSumar}>+</button>
+      </div>
+      <button onClick={handleAgregarAlCarrito}>Agregar al Carrito</button>
     </div>
   );
 };
